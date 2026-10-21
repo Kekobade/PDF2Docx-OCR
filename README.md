@@ -1,5 +1,17 @@
 # pdf2docx-ocr
 
+<p align="center">
+  <b>Turn scanned, image-only PDFs and photos of pages into editable Word documents. Fully offline.</b><br>
+  <i>Powered by <code>Tesseract</code>, <code>Poppler</code>, <code>OpenCV</code>, and <code>python-docx</code>.</i>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/python-3.8+-00f2fe?style=for-the-badge&logo=python&logoColor=black" alt="Python 3.8+" />
+  <img src="https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-4facfe?style=for-the-badge" alt="Platforms" />
+  <img src="https://img.shields.io/badge/runs-100%25%20offline-2ea44f?style=for-the-badge" alt="Runs offline" />
+  <img src="https://img.shields.io/badge/license-MIT-a8ff78?style=for-the-badge&logoColor=black" alt="MIT License" />
+</p>
+
 This folder has **two tools**:
 
 | Tool | Use it when |
@@ -7,6 +19,34 @@ This folder has **two tools**:
 | `layout_ocr_to_docx.py` | You want the Word file to **look like the original page**: same positions, text colours, pictures kept as pictures, boxes and tables redrawn (see "Layout mode" below) |
 | `pdf2docx_ocr.py` | You just want the **text** (or other formats like TXT, Markdown, HTML, searchable PDF, PNG/JPG) |
 
+## Quick install
+
+You need **Python 3.8+**, **Tesseract OCR** and **Poppler**, then the Python packages. Pick your system:
+
+| System | Install Python, Tesseract and Poppler |
+|--------|----------------------------------------|
+| **Windows** (PowerShell as admin, with [Chocolatey](https://chocolatey.org/install)) | `choco install python tesseract poppler -y` |
+| **macOS** (with [Homebrew](https://brew.sh)) | `brew install python tesseract poppler` |
+| **Debian / Ubuntu / Linux Mint / Pop!_OS** | `sudo apt update && sudo apt install -y python3 python3-venv python3-pip tesseract-ocr poppler-utils` |
+| **Fedora / RHEL / Rocky / AlmaLinux** | `sudo dnf install -y python3 python3-pip tesseract poppler-utils` |
+| **Arch / Manjaro / EndeavourOS** | `sudo pacman -S --needed python python-pip tesseract tesseract-data-eng poppler` |
+| **openSUSE** | `sudo zypper install python3 python3-pip tesseract-ocr tesseract-ocr-traineddata-english poppler-tools` |
+| **Alpine** | `sudo apk add python3 py3-pip tesseract-ocr poppler-utils` |
+| **Windows Subsystem for Linux (WSL)** | Use the Ubuntu line above inside WSL |
+
+Then, in this folder:
+
+```bash
+python -m venv venv
+# Windows:      venv\Scripts\activate
+# macOS/Linux:  source venv/bin/activate
+pip install -r requirements.txt
+python pdf2docx_ocr.py --check
+```
+
+On Linux and macOS you may need `python3` instead of `python`. Other install routes (winget, Scoop, MacPorts, manual installers), extra OCR languages and fixes are in [1. Installation](#1-installation) below.
+
+---
 
 A command-line tool that converts **image-based PDFs** (scans, screenshots, photos saved as PDF) and **image files** into editable documents or cleaned-up images.
 
@@ -128,35 +168,147 @@ Formats that don't need OCR (`docx-image`, `png`, `jpg`) work even without Tesse
 
 ## 1. Installation
 
-### Step 1: Tesseract OCR
+You need four things: **Python 3.8+**, **Tesseract OCR** (reads the text), **Poppler** (turns PDF pages into images) and the **Python packages** in `requirements.txt`. Install the system tools for your OS first.
 
-**Windows:** download the installer from the UB Mannheim Tesseract builds (search "Tesseract UB Mannheim"). Tick the extra languages you need during install. Default path: `C:\Program Files\Tesseract-OCR`.
+### Step 1: Install Python, Tesseract and Poppler
 
-**macOS:**
-```bash
-brew install tesseract
+<details open>
+<summary><b>Windows</b></summary>
+
+**Option A: Chocolatey** (PowerShell opened as Administrator; install Chocolatey first from chocolatey.org/install)
+
+```powershell
+choco install python tesseract poppler -y
 ```
 
-**Linux (Debian/Ubuntu):**
-```bash
-sudo apt update && sudo apt install tesseract-ocr
+**Option B: Scoop** (no admin needed; install Scoop first from scoop.sh)
+
+```powershell
+scoop install python tesseract poppler
 ```
 
-### Step 2: Poppler (turns PDF pages into images)
+**Option C: winget + manual Poppler**
 
-**Windows:** download a Poppler for Windows build, extract it (for example to `C:\poppler`), then either add `C:\poppler\Library\bin` to PATH or use `--poppler-path` each time.
-
-**macOS:**
-```bash
-brew install poppler
+```powershell
+winget install Python.Python.3.12
+winget install UB-Mannheim.TesseractOCR
 ```
 
-**Linux:**
-```bash
-sudo apt install poppler-utils
+Poppler has no official installer. Download a Poppler for Windows release (search "poppler windows release", extract it, for example to `C:\poppler`), then add `C:\poppler\Library\bin` to your PATH.
+
+**Option D: manual installers**
+
+- Python: download from python.org and tick **Add python.exe to PATH** in the installer.
+- Tesseract: download the installer from the UB Mannheim Tesseract builds (search "Tesseract UB Mannheim"). Tick the extra languages you need. Default path: `C:\Program Files\Tesseract-OCR`.
+- Poppler: as in Option C.
+
+**Add a folder to PATH:** Start menu, search "Edit environment variables", open it, select `Path`, click Edit, New, paste the folder, then OK. **Close and reopen** your terminal afterwards.
+
+If you would rather not edit PATH, pass the locations each time:
+
+```bat
+python pdf2docx_ocr.py scan.pdf --tesseract-cmd "C:\Program Files\Tesseract-OCR\tesseract.exe" --poppler-path "C:\poppler\Library\bin"
 ```
 
-### Step 3: Python packages
+Check: `tesseract --version` and `pdftoppm -h` should both print something.
+
+</details>
+
+<details>
+<summary><b>macOS</b></summary>
+
+**Homebrew** (install Homebrew first from brew.sh):
+
+```bash
+brew install python tesseract poppler
+```
+
+Extra OCR languages (all of them, about 600 MB):
+
+```bash
+brew install tesseract-lang
+```
+
+**MacPorts** (alternative):
+
+```bash
+sudo port install python312 tesseract poppler
+```
+
+On Apple Silicon and Intel Macs the commands are the same. Check: `tesseract --version` and `pdftoppm -h`.
+
+</details>
+
+<details>
+<summary><b>Linux: Debian, Ubuntu, Linux Mint, Pop!_OS, Kali, Raspberry Pi OS</b></summary>
+
+```bash
+sudo apt update
+sudo apt install -y python3 python3-venv python3-pip tesseract-ocr poppler-utils
+```
+
+Extra languages, for example Hindi: `sudo apt install tesseract-ocr-hin`
+
+</details>
+
+<details>
+<summary><b>Linux: Fedora, RHEL, Rocky Linux, AlmaLinux, CentOS Stream</b></summary>
+
+```bash
+sudo dnf install -y python3 python3-pip tesseract poppler-utils
+```
+
+On RHEL, Rocky, AlmaLinux and CentOS Stream, Tesseract may live in EPEL. If dnf cannot find it, run `sudo dnf install -y epel-release` first and try again.
+
+Extra languages, for example Hindi: `sudo dnf install tesseract-langpack-hin`
+
+</details>
+
+<details>
+<summary><b>Linux: Arch, Manjaro, EndeavourOS</b></summary>
+
+```bash
+sudo pacman -S --needed python python-pip tesseract tesseract-data-eng poppler
+```
+
+Extra languages, for example Hindi: `sudo pacman -S tesseract-data-hin`
+
+</details>
+
+<details>
+<summary><b>Linux: openSUSE (Leap and Tumbleweed)</b></summary>
+
+```bash
+sudo zypper install python3 python3-pip tesseract-ocr tesseract-ocr-traineddata-english poppler-tools
+```
+
+Extra languages: install the matching `tesseract-ocr-traineddata-<language>` package. Search with `zypper search tesseract-ocr-traineddata`.
+
+</details>
+
+<details>
+<summary><b>Linux: Alpine</b></summary>
+
+```bash
+sudo apk add python3 py3-pip tesseract-ocr poppler-utils
+```
+
+Extra languages, for example Hindi: `sudo apk add tesseract-ocr-data-hin`
+
+Alpine uses musl, so pip may not find ready-made `numpy` or `opencv-python-headless` packages. If `pip install` fails, install them with apk (`sudo apk add py3-numpy py3-opencv`) and create the virtual environment with `python3 -m venv --system-site-packages venv`.
+
+</details>
+
+<details>
+<summary><b>Windows Subsystem for Linux (WSL)</b></summary>
+
+Inside WSL (Ubuntu), follow the Debian/Ubuntu steps above. Windows files are under `/mnt/c/...`, for example `python3 pdf2docx_ocr.py /mnt/c/Users/you/Downloads/scan.pdf`.
+
+</details>
+
+Other distributions: install the packages that provide the `tesseract` and `pdftoppm` commands (on most distributions they are called something like `tesseract` or `tesseract-ocr`, and `poppler-utils` or `poppler`).
+
+### Step 2: Python packages
 
 Python 3.8+ is required. A virtual environment is recommended:
 
@@ -171,7 +323,11 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### Step 4: Verify
+On Linux and macOS use `python3` if `python` is not found.
+
+> If pip says **externally-managed-environment** (common on newer Debian, Ubuntu and Fedora), do not use `--break-system-packages`. Create and activate the virtual environment above, then run `pip install -r requirements.txt` inside it.
+
+### Step 3: Verify
 
 ```bash
 python pdf2docx_ocr.py --check

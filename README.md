@@ -43,7 +43,8 @@ Output defaults to `<input>_layout.docx`. One input file per run (a PDF can have
 | Text colour, relative text size | Sizes are estimates; use `--font-scale 1.05` etc. to adjust all of them |
 | Photos and diagrams as pictures | Text inside pictures stays part of the picture (use `--keep-image-text` to also read it) |
 | Box outlines and table grids as shapes | Tables are drawn as lines and separate text, **not** as a real Word table you can add rows to |
-| Bold on headings and clearly heavier lines | Bold detection is a guess; tune with `--bold-factor` or turn it off with `--no-bold`. Italic and underline are not detected |
+| Bold, italic, and underline detection | Bold is detected via relative stroke weight and tuned with `--bold-factor` (or `--no-bold`). Italic is detected via projection profile shear deskewing (or `--no-italic`). Underlines are matched from line shapes directly to text runs (or `--no-underline`) |
+| Paragraph and text alignment | Left, center, right, and justified alignment are automatically detected and emitted as Word alignment properties (or `--no-align`) |
 | Coloured header bars and page backgrounds | Gradients, shadows, rounded corners and dashed lines are not reproduced |
 
 Because the page is rebuilt from fixed positions, it is a **look-alike you can copy text from**, not a flowing document that reflows when you edit it. If your PDF contains real selectable text (not only images), `pip install pdf2docx` gives much better results for it.
@@ -65,8 +66,12 @@ The file is tested with LibreOffice. Open it in Word 2013 or newer. If Word repo
 | `--font-scale` | Multiply all font sizes | `1.0` |
 | `--no-bold` | Turn off bold detection | off |
 | `--bold-factor` | Higher means less bold | `1.2` |
+| `--no-italic` | Turn off italic slant detection | off |
+| `--no-underline` | Turn off underline detection (retains separate line shapes) | off |
+| `--no-align` | Turn off paragraph alignment detection (keep all left-aligned) | off |
 | `--y-offset` | Move all text down by N points (negative = up) | `0` |
 | `--box-per-line` | One text box per line: most exact positions, but each line is separate to copy | off |
+| `--page-batch` | Number of PDF pages to render per Poppler batch | `5` |
 | `--min-image-pct` | Smallest picture to keep, as % of page area | `0.3` |
 | `--bg-tol` | How different from paper colour counts as content | `45` |
 | `--no-images` | Do not extract pictures | off |
@@ -281,6 +286,7 @@ python pdf2docx_ocr.py scan.pdf ^
 | `--threshold N` | Pure black/white at level N (0 to 255, try 150) | off |
 | `--rotate N` | Rotate clockwise by N degrees | `0` |
 | `--auto-rotate` | Detect orientation with Tesseract (best effort) | off |
+| `--page-batch` | Number of PDF pages to render per Poppler batch | `5` |
 | `--check` | Verify your installation | |
 | `--poppler-path` | Folder containing Poppler binaries (Windows) | |
 | `--tesseract-cmd` | Full path to the Tesseract executable | |

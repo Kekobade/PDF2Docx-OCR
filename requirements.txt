@@ -1,0 +1,7 @@
+pytesseract
+pdf2image
+python-docx
+pillow
+pypdf
+numpy
+opencv-python-headless
